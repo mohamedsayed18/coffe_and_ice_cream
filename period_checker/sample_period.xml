@@ -1,0 +1,6 @@
+<Period duration="PT59.2S" id="2215" start="PT1614853010.04S">
+    <BaseURL>dash/</BaseURL>
+    <AdaptationSet audioSamplingRate="48000" codecs="mp4a.40.5" contentType="audio" group="1" id="1" lang="en" mimeType="audio/mp4" segmentAlignment="true" startWithSAP="1">
+    </AdaptationSet>
+    <!-- <AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2" /> -->
+</Period>
