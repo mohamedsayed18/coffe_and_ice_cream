@@ -1,6 +1,7 @@
 # from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 
+from . import items
 
 system_state = 'Login'
 
@@ -15,3 +16,6 @@ def login(request):
 
 def change_system_state(request):
     return JsonResponse({'state': system_state})
+
+def handle_items(request):
+    return JsonResponse({'items list': items.subscriptions})
