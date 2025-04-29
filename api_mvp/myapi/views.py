@@ -1,7 +1,9 @@
 # from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
+from dataclasses import asdict
 
 from . import items
 
@@ -14,6 +16,8 @@ transition_states = {
     'Item Details': ['Dashboard', 'Item Control'],
     'Item Control': ['Dashboard', 'Item Details'],
 }
+
+all_items = items.subscriptions
 
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
@@ -45,15 +49,16 @@ def filter_items(items_list: list, filter: str) -> list:
             filtered_items.append(item)
     return filtered_items
 
-def create_item(id: str, description: str) -> items.Item:
-    items.Item(id, description, items.state.INIT.value)
+def create_item(id: str, description: str) -> dict:
+    return asdict(items.Item(id, description, items.state.INIT.value))
 
+@csrf_exempt
 def handle_items(request):
+    global all_items
     if request.method == 'GET':
         page_number = request.GET.get('page', 1)
         page_size = request.GET.get('page_size', 10)
         state_filter = request.GET.get('state')
-        all_items = items.subscriptions
         if state_filter:
             all_items = filter_items(items.subscriptions, state_filter)
         paginator = Paginator(all_items, page_size)
@@ -66,5 +71,5 @@ def handle_items(request):
         }
         return JsonResponse(data)
     elif request.method == 'POST':
-        create_item('new_item', 'test item')
+        all_items.append(create_item('new_item', 'test item'))
         return JsonResponse({'new item added': 'success'})
