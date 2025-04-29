@@ -1,4 +1,4 @@
-# from django.shortcuts import render
+from datetime import datetime
 from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -50,7 +50,7 @@ def filter_items(items_list: list, filter: str) -> list:
     return filtered_items
 
 def create_item(id: str, description: str) -> dict:
-    return asdict(items.Item(id, description, items.state.INIT.value))
+    return asdict(items.Item(id, description, items.state.INIT.value, datetime.now().date().isoformat()))
 
 @csrf_exempt
 def handle_items(request):
