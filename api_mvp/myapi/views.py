@@ -52,6 +52,12 @@ def filter_items(items_list: list, filter: str) -> list:
 def create_item(id: str, description: str) -> dict:
     return asdict(items.Item(id, description, items.state.INIT.value, datetime.now().date().isoformat()))
 
+def get_item(id: str)->dict:
+    global all_items
+    for i in all_items:
+        if i['id'] == id:
+            return JsonResponse({'item': i})
+
 @csrf_exempt
 def handle_items(request):
     global all_items
@@ -59,6 +65,9 @@ def handle_items(request):
         page_number = request.GET.get('page', 1)
         page_size = request.GET.get('page_size', 10)
         sort_order = request.GET.get('sort')
+        id = request.GET.get('id')
+        if id:
+            return get_item(id)
 
         if sort_order:
             reverse = sort_order == 'desc'
