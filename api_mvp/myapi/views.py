@@ -38,10 +38,21 @@ def change_system_state(request):
     elif request.method == 'GET':
         return JsonResponse({'state': system_state})
 
+def filter_items(items_list: list, filter: str) -> list:
+    filtered_items: list = []
+    for item in items_list:
+        if item['state'] == filter:
+            filtered_items.append(item)
+    return filtered_items
+
 def handle_items(request):
     page_number = request.GET.get('page', 1)
     page_size = request.GET.get('page_size', 3)
-    paginator = Paginator(items.subscriptions, page_size)
+    state_filter = request.GET.get('state')
+    all_items = items.subscriptions
+    if state_filter:
+        all_items = filter_items(items.subscriptions, state_filter)
+    paginator = Paginator(all_items, page_size)
     page_obj = paginator.get_page(page_number)
 
     data = {
