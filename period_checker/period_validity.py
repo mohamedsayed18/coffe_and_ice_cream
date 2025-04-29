@@ -33,13 +33,21 @@ def valid_period(period: ET.ElementTree) -> bool:
         seg_template = rep.find('SegmentTemplate')
         if seg_template is not None:
             media = seg_template.attrib.get('media')
-            initialization = seg_template.attrib.get('initialization')
             if not media:
                 print('Invalid period, No media')
                 return False
             elif '$Number$' not in media and '$Time$' not in media:
                 print('Invalid period, No Number or times format')
                 return False
+
+            initialization = seg_template.attrib.get('initialization')
+            if not initialization:
+                print('Invalid period, No initialization')
+                return False
+
+        else:
+            print('Invalid period, No segment template')
+            return False
 
     return True
 
