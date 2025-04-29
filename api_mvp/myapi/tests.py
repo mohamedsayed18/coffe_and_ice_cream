@@ -23,3 +23,9 @@ class TestApi(TestCase):
         response = self.client.get(url)
         response_data = json.loads(response.content)
         self.assertEqual(response_data['state'], 'Dashboard')
+
+    def test_change_state_failure(self):
+        url = 'http://localhost:8000/myapi/state/'
+        data = {'new_state': 'Item Details'}
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 409)
