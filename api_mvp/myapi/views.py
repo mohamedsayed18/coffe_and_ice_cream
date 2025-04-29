@@ -1,5 +1,6 @@
 # from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+import json
 
 from . import items
 
@@ -15,7 +16,15 @@ def login(request):
         return JsonResponse({'token': '789'})
 
 def change_system_state(request):
-    return JsonResponse({'state': system_state})
+    global system_state
+    if request.method == 'POST':
+        body = json.loads(request.body)
+        new_state = body.get('new_state')
+        system_state = new_state
+        return JsonResponse({'new_state': system_state})
+
+    elif request.method == 'GET':
+        return JsonResponse({'state': system_state})
 
 def handle_items(request):
     return JsonResponse({'items list': items.subscriptions})
