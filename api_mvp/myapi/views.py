@@ -45,19 +45,26 @@ def filter_items(items_list: list, filter: str) -> list:
             filtered_items.append(item)
     return filtered_items
 
-def handle_items(request):
-    page_number = request.GET.get('page', 1)
-    page_size = request.GET.get('page_size', 3)
-    state_filter = request.GET.get('state')
-    all_items = items.subscriptions
-    if state_filter:
-        all_items = filter_items(items.subscriptions, state_filter)
-    paginator = Paginator(all_items, page_size)
-    page_obj = paginator.get_page(page_number)
+def create_item(id: str, description: str) -> items.Item:
+    items.Item(id, description, items.state.INIT.value)
 
-    data = {
-        'count': paginator.count,
-        'num_pages': paginator.num_pages,
-        'reult': [item for item in page_obj.object_list]
-    }
-    return JsonResponse(data)
+def handle_items(request):
+    if request.method == 'GET':
+        page_number = request.GET.get('page', 1)
+        page_size = request.GET.get('page_size', 10)
+        state_filter = request.GET.get('state')
+        all_items = items.subscriptions
+        if state_filter:
+            all_items = filter_items(items.subscriptions, state_filter)
+        paginator = Paginator(all_items, page_size)
+        page_obj = paginator.get_page(page_number)
+
+        data = {
+            'count': paginator.count,
+            'num_pages': paginator.num_pages,
+            'reult': [item for item in page_obj.object_list]
+        }
+        return JsonResponse(data)
+    elif request.method == 'POST':
+        create_item('new_item', 'test item')
+        return JsonResponse({'new item added': 'success'})
