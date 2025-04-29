@@ -58,6 +58,12 @@ def handle_items(request):
     if request.method == 'GET':
         page_number = request.GET.get('page', 1)
         page_size = request.GET.get('page_size', 10)
+        sort_order = request.GET.get('sort')
+
+        if sort_order:
+            reverse = sort_order == 'desc'
+            all_items.sort(key=lambda item: item['created_at'], reverse=reverse)
+
         state_filter = request.GET.get('state')
         if state_filter:
             all_items = filter_items(items.subscriptions, state_filter)
