@@ -71,5 +71,8 @@ def handle_items(request):
         }
         return JsonResponse(data)
     elif request.method == 'POST':
-        all_items.append(create_item('new_item', 'test item'))
+        body = json.loads(request.body)
+        id = body.get('id')
+        description = body.get('description')
+        all_items.append(create_item(id, description))
         return JsonResponse({'new item added': 'success'})
