@@ -59,6 +59,15 @@ def get_item(id: str)->dict:
             return JsonResponse({'item': i})
 
 @csrf_exempt
+def run_item_view(request, item_id:str):
+    global all_items
+    if request.method == 'POST':
+        for i in all_items:
+            if i['id'] == item_id:
+                i['state'] = items.state.RUN.value
+                return JsonResponse({'result': f'item: {i['id']} is running'})
+
+@csrf_exempt
 def handle_items(request):
     global all_items
     if request.method == 'GET':
@@ -82,7 +91,7 @@ def handle_items(request):
         data = {
             'count': paginator.count,
             'num_pages': paginator.num_pages,
-            'reult': [item for item in page_obj.object_list]
+            'result': [item for item in page_obj.object_list]
         }
         return JsonResponse(data)
     elif request.method == 'POST':
