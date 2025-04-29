@@ -16,9 +16,9 @@ class Item:
     state: str
 
 netflix = Item('Netflix', 'tv shows', str(state.INIT))
-hbo = Item('hbo', 'documentary', state.RUN)
-ps = Item('ps', 'ps games', state.PAUSE)
-xbox = Item('xbox', 'xbox games', state.STOP)
+hbo = Item('hbo', 'documentary', str(state.RUN))
+ps = Item('ps', 'ps games', str(state.PAUSE))
+xbox = Item('xbox', 'xbox games', str(state.STOP))
 
 
-subscriptions = [asdict(netflix)]
+subscriptions = [asdict(netflix), asdict(hbo), asdict(ps), asdict(xbox)]

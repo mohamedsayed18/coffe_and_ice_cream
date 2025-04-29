@@ -1,4 +1,5 @@
 # from django.shortcuts import render
+from django.core.paginator import Paginator
 from django.http import HttpResponse, JsonResponse
 import json
 
@@ -38,4 +39,14 @@ def change_system_state(request):
         return JsonResponse({'state': system_state})
 
 def handle_items(request):
-    return JsonResponse({'items list': items.subscriptions})
+    page_number = request.GET.get('page', 1)
+    page_size = request.GET.get('page_size', 3)
+    paginator = Paginator(items.subscriptions, page_size)
+    page_obj = paginator.get_page(page_number)
+
+    data = {
+        'count': paginator.count,
+        'num_pages': paginator.num_pages,
+        'reult': [item for item in page_obj.object_list]
+    }
+    return JsonResponse(data)
