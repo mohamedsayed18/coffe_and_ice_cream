@@ -34,11 +34,17 @@ def set_system_state(new_state: str) -> None:
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
-def login(request): #TODO
-    if get_system_state() == 'dashboard':
-        return JsonResponse({'token': 'abc123'})
-    else:
-        return JsonResponse({'token': '789'})
+@csrf_exempt
+def login(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        if username == 'admin' and password == '1234':
+            set_system_state('Dashboard')
+            return JsonResponse({'result': 'successfully logged in'})
+        else:
+            return JsonResponse({'error': 'Failed login, wrong username or password'}, status=401)
 
 @csrf_exempt
 def change_system_state(request):
