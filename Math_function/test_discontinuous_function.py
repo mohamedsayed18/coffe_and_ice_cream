@@ -13,3 +13,7 @@ class TestDiscontinuousFunction(unittest.TestCase):
     def test_in_range_positive(self):
         result = discontinuous(33)
         self.assertEqual(result, 21)
+
+    def test_out_of_range(self) -> None:
+        with self.assertRaises(ValueError):
+            discontinuous(-1)

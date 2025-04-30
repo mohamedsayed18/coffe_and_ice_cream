@@ -3,8 +3,7 @@
 
 def discontinuous(x: float) -> float:
     if x == -1:
-        # TODO raise exception
-        pass
+        raise ValueError(f'Number {x} is out of range')
     elif -10 <= x <= -2:
         return -(x**2)
     elif -2 < x <= 9:
