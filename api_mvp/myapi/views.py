@@ -71,29 +71,33 @@ def run_item_view(request, item_id:str):
 def handle_items(request):
     global all_items
     if request.method == 'GET':
-        page_number = request.GET.get('page', 1)
-        page_size = request.GET.get('page_size', 10)
-        sort_order = request.GET.get('sort')
-        id = request.GET.get('id')
-        if id:
-            return get_item(id)
+        if system_state == 'Dashboard':
+            page_number = request.GET.get('page', 1)
+            page_size = request.GET.get('page_size', 10)
+            sort_order = request.GET.get('sort')
+            id = request.GET.get('id')
+            if id:
+                return get_item(id)
 
-        if sort_order:
-            reverse = sort_order == 'desc'
-            all_items.sort(key=lambda item: item['created_at'], reverse=reverse)
+            if sort_order:
+                reverse = sort_order == 'desc'
+                all_items.sort(key=lambda item: item['created_at'], reverse=reverse)
 
-        state_filter = request.GET.get('state')
-        if state_filter:
-            all_items = filter_items(items.subscriptions, state_filter)
-        paginator = Paginator(all_items, page_size)
-        page_obj = paginator.get_page(page_number)
+            state_filter = request.GET.get('state')
+            if state_filter:
+                all_items = filter_items(items.subscriptions, state_filter)
+            paginator = Paginator(all_items, page_size)
+            page_obj = paginator.get_page(page_number)
 
-        data = {
-            'count': paginator.count,
-            'num_pages': paginator.num_pages,
-            'result': [item for item in page_obj.object_list]
-        }
-        return JsonResponse(data)
+            data = {
+                'count': paginator.count,
+                'num_pages': paginator.num_pages,
+                'result': [item for item in page_obj.object_list]
+            }
+            return JsonResponse(data)
+        else:
+            return JsonResponse({'error': f'Operation is not allowed'}, status=409) # TODO more details
+
     elif request.method == 'POST':
         body = json.loads(request.body)
         id = body.get('id')
