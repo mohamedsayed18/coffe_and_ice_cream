@@ -74,15 +74,18 @@ def run_item_view(request, item_id:str):
 @csrf_exempt
 def handle_items(request):
     global all_items
-    if system_state == 'Dashboard':
-        if request.method == 'GET':
-            page_number = request.GET.get('page', 1)
-            page_size = request.GET.get('page_size', 10)
-            sort_order = request.GET.get('sort')
-            id = request.GET.get('id')
-            if id:
+    if request.method == 'GET':
+        page_number = request.GET.get('page', 1)
+        page_size = request.GET.get('page_size', 10)
+        sort_order = request.GET.get('sort')
+        id = request.GET.get('id')
+        if id:
+            if system_state == 'Item Details':
                 return get_item(id)
+            else:
+                return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
 
+        if system_state == 'Dashboard':
             if sort_order:
                 reverse = sort_order == 'desc'
                 all_items.sort(key=lambda item: item['created_at'], reverse=reverse)
@@ -99,16 +102,18 @@ def handle_items(request):
                 'result': [item for item in page_obj.object_list]
             }
             return JsonResponse(data)
+        else:
+            return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
 
-        elif request.method == 'POST':
+    elif request.method == 'POST':
+        if system_state == 'Dashboard':
             body = json.loads(request.body)
             id = body.get('id')
             description = body.get('description')
             all_items.append(create_item(id, description))
             return JsonResponse({'new item added': 'success'})
-
-    else:
-        return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
+        else:
+            return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
 
 def update_credentials():
     pass    #TODO
