@@ -7,7 +7,7 @@ from dataclasses import asdict
 
 from . import items
 
-system_state = 'Log in'
+system_state = 'Log in' # TODO Make system states Enum
 item_control_allowed: bool = False
 
 transition_states = {
@@ -115,6 +115,7 @@ def update_credentials():
 
 @csrf_exempt
 def update_user(request):
+    global system_state
     if system_state == 'Config':
         if request.method == 'PUT':
             try:
@@ -122,6 +123,7 @@ def update_user(request):
                 username = data.get('username')
                 password = data.get('password')
                 update_credentials()
+                system_state = 'Log in'
                 return JsonResponse({'message': 'User updated'}, status=200)
             except json.JSONDecodeError:
                 return JsonResponse({'error': 'Invalid JSON'}, status=400)
@@ -130,11 +132,13 @@ def update_user(request):
 
 @csrf_exempt
 def item_control_access(request) -> None:
+    global system_state
     global item_control_allowed
     if system_state == 'Config':
         if request.method == 'PUT':
             data = json.loads(request.body)
             item_control_allowed = data.get('allowed')
+            system_state = 'Log in'
             return JsonResponse({'message': f'Access to Item Control set to {item_control_allowed}'})
         else:
             return JsonResponse({'error': 'Method not allowed'}, status=405)
