@@ -1,8 +1,13 @@
 from django.test import TestCase
 import json
 
+from . import models
+
 
 class TestApi(TestCase):
+    def setUp(self):
+        models.SystemSettings.objects.create(settings='system_state', value='Log in')
+
     def test_login_success(self):
         url = 'http://localhost:8000/myapi/login/'
         data = {

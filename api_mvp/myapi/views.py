@@ -6,10 +6,12 @@ import json
 from dataclasses import asdict
 
 from . import items
+from . import models
 
-system_state = 'Log in' # TODO Make system states Enum
+
 item_control_allowed: bool = False
 
+# TODO Make system states Enum
 transition_states = {
     'Log in': ['Dashboard'],
     'Dashboard': ['Log in', 'Config', 'Item Details', 'Item Control'],
@@ -20,31 +22,39 @@ transition_states = {
 
 all_items = items.subscriptions
 
+def get_system_state() -> str:
+    state_obj = models.SystemSettings.objects.get(settings='system_state')
+    return state_obj.value
+
+def set_system_state(new_state: str) -> None:
+    system_state, _ = models.SystemSettings.objects.get_or_create(settings='system_state')
+    system_state.value = new_state
+    system_state.save()
+
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
 def login(request): #TODO
-    if system_state == 'dashboard':
+    if get_system_state() == 'dashboard':
         return JsonResponse({'token': 'abc123'})
     else:
         return JsonResponse({'token': '789'})
 
 @csrf_exempt
 def change_system_state(request):
-    global system_state
     if request.method == 'POST':
         body = json.loads(request.body)
         new_state = body.get('new_state')
-        if new_state in transition_states[system_state]:
+        if new_state in transition_states[get_system_state()]:
             if new_state == 'Item Control' and not item_control_allowed:
                 return JsonResponse({'error': f'Transition to Item Control Denied'}, status=409)
-            system_state = new_state
-            return JsonResponse({'new_state': system_state})
+            set_system_state(new_state)
+            return JsonResponse({'new_state': get_system_state()})
         else:
-            return JsonResponse({'error': f'Cannot transition from {system_state} to {new_state}'}, status=409)
+            return JsonResponse({'error': f'Cannot transition from {get_system_state()} to {new_state}'}, status=409)
 
     elif request.method == 'GET':
-        return JsonResponse({'state': system_state})
+        return JsonResponse({'state': get_system_state()})
 
 def filter_items(items_list: list, filter: str) -> list:
     filtered_items: list = []
@@ -66,7 +76,7 @@ def get_item(id: str)->dict:
 def change_item_state(request, item_id:str):
     global all_items
     if request.method == 'PUT':
-        if system_state == 'Item Control':
+        if get_system_state() == 'Item Control':
             data = json.loads(request.body)
             state = data.get('state')
             for i in all_items:
@@ -83,12 +93,12 @@ def handle_items(request):
         sort_order = request.GET.get('sort')
         id = request.GET.get('id')
         if id:
-            if system_state == 'Item Details':
+            if get_system_state() == 'Item Details':
                 return get_item(id)
             else:
-                return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
+                return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
 
-        if system_state == 'Dashboard':
+        if get_system_state() == 'Dashboard':
             if sort_order:
                 reverse = sort_order == 'desc'
                 all_items.sort(key=lambda item: item['created_at'], reverse=reverse)
@@ -106,32 +116,31 @@ def handle_items(request):
             }
             return JsonResponse(data)
         else:
-            return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
+            return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
 
     elif request.method == 'POST':
-        if system_state == 'Dashboard':
+        if get_system_state() == 'Dashboard':
             body = json.loads(request.body)
             id = body.get('id')
             description = body.get('description')
             all_items.append(create_item(id, description))
             return JsonResponse({'new item added': 'success'})
         else:
-            return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
+            return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
 
 def update_credentials():
     pass    #TODO
 
 @csrf_exempt
 def update_user(request):
-    global system_state
-    if system_state == 'Config':
+    if get_system_state() == 'Config':
         if request.method == 'PUT':
             try:
                 data = json.loads(request.body)
                 username = data.get('username')
                 password = data.get('password')
                 update_credentials()
-                system_state = 'Log in'
+                set_system_state('Log in')
                 return JsonResponse({'message': 'User updated'}, status=200)
             except json.JSONDecodeError:
                 return JsonResponse({'error': 'Invalid JSON'}, status=400)
@@ -140,16 +149,15 @@ def update_user(request):
 
 @csrf_exempt
 def item_control_access(request) -> None:
-    global system_state
     global item_control_allowed
-    if system_state == 'Config':
+    if get_system_state() == 'Config':
         if request.method == 'PUT':
             data = json.loads(request.body)
             item_control_allowed = data.get('allowed')
-            system_state = 'Log in'
+            set_system_state('Log in')
             return JsonResponse({'message': f'Access to Item Control set to {item_control_allowed}'})
         else:
             return JsonResponse({'error': 'Method not allowed'}, status=405)
 
     else:
-        return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
+        return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
