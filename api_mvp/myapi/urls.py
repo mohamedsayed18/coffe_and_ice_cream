@@ -8,4 +8,6 @@ urlpatterns = [
     path('state/', views.change_system_state),
     path('items/', views.handle_items),
     path('items/<str:item_id>/run/', views.run_item_view),
+    path('user/', views.update_user),
+    path('item-control/', views.item_control_access),
 ]

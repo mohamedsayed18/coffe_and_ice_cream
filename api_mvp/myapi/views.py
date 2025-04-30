@@ -8,6 +8,7 @@ from dataclasses import asdict
 from . import items
 
 system_state = 'Log in'
+item_control_allowed: bool = False
 
 transition_states = {
     'Log in': ['Dashboard'],
@@ -22,18 +23,21 @@ all_items = items.subscriptions
 def index(request):
     return HttpResponse("Hello, world. You're at the polls index.")
 
-def login(request):
+def login(request): #TODO
     if system_state == 'dashboard':
         return JsonResponse({'token': 'abc123'})
     else:
         return JsonResponse({'token': '789'})
 
+@csrf_exempt
 def change_system_state(request):
     global system_state
     if request.method == 'POST':
         body = json.loads(request.body)
         new_state = body.get('new_state')
         if new_state in transition_states[system_state]:
+            if new_state == 'Item Control' and not item_control_allowed:
+                return JsonResponse({'error': f'Transition to Item Control Denied'}, status=409)
             system_state = new_state
             return JsonResponse({'new_state': system_state})
         else:
@@ -104,4 +108,36 @@ def handle_items(request):
             return JsonResponse({'new item added': 'success'})
 
     else:
-        return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409) # TODO more details
+        return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
+
+def update_credentials():
+    pass    #TODO
+
+@csrf_exempt
+def update_user(request):
+    if system_state == 'Config':
+        if request.method == 'PUT':
+            try:
+                data = json.loads(request.body)
+                username = data.get('username')
+                password = data.get('password')
+                update_credentials()
+                return JsonResponse({'message': 'User updated'}, status=200)
+            except json.JSONDecodeError:
+                return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        else:
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def item_control_access(request) -> None:
+    global item_control_allowed
+    if system_state == 'Config':
+        if request.method == 'PUT':
+            data = json.loads(request.body)
+            item_control_allowed = data.get('allowed')
+            return JsonResponse({'message': f'Access to Item Control set to {item_control_allowed}'})
+        else:
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+    else:
+        return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409)
