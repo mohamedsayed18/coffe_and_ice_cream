@@ -31,9 +31,6 @@ def set_system_state(new_state: str) -> None:
     system_state.value = new_state
     system_state.save()
 
-def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
-
 @csrf_exempt
 def login(request):
     if request.method == 'POST':
