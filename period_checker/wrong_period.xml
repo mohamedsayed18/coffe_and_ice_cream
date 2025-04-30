@@ -1,8 +1,8 @@
-<Period duration="PT59.2S" id="2215" start="PT1614853010.04S">
+<Period duration="PT59.2S" id="2215">
     <BaseURL>dash/</BaseURL>
     <AdaptationSet contentType="video" mimeType="video/mp4">
         <Representation id="1" bandwidth="4000000" width="1920" height="1080" codecs="avc1.4D4028">
-            <SegmentTemplate timescale="48000" media="audio/en/$Time$.mp4a">
+            <SegmentTemplate timescale="48000" initialization="audio/en/init.mp4a" media="audio/en/$Time$.mp4a">
                 <SegmentTimeline> 
                     <S t="0" d="96000" r="432"/> 
                 </SegmentTimeline> 

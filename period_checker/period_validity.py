@@ -14,8 +14,13 @@ import xml.etree.ElementTree as ET
 
 
 def valid_period(period: ET.ElementTree) -> bool:
-    # check adaptationset
     root = period.getroot()
+    start = root.attrib.get('start')
+    if not start:
+        print('Invalid Period, no start found')
+        return False
+
+    # check adaptationset
     adaptationset = root.findall('AdaptationSet')
     if not adaptationset:
         print('Invalid Period, no adaptationset')
