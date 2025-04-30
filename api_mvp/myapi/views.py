@@ -63,13 +63,16 @@ def get_item(id: str)->dict:
             return JsonResponse({'item': i})
 
 @csrf_exempt
-def run_item_view(request, item_id:str):
+def change_item_state(request, item_id:str):
     global all_items
-    if request.method == 'POST':
-        for i in all_items:
-            if i['id'] == item_id:
-                i['state'] = items.state.RUN.value
-                return JsonResponse({'result': f'item: {i['id']} is running'})
+    if request.method == 'PUT':
+        if system_state == 'Item Control':
+            data = json.loads(request.body)
+            state = data.get('state')
+            for i in all_items:
+                if i['id'] == item_id:
+                    i['state'] = state # TODO USE enum to avoid typo
+                    return JsonResponse({'result': f'item {i['id']} state is {state}'})
 
 @csrf_exempt
 def handle_items(request):
