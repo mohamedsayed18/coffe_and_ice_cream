@@ -30,8 +30,11 @@ class TestApi(TestCase):
         response = self.client.post(url, data=json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 409)
 
-    def test_add_item(self):
+    def test_add_item_failure(self):
         url = 'http://localhost:8000/myapi/items/'
         data = {'new_state': 'Item Details'}
         response = self.client.post(url, data=json.dumps(data), content_type='application/json')
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 409)
+
+    def test_add_item_in_correct_state(self):
+        pass

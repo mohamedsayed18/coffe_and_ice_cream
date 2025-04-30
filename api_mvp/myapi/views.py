@@ -70,8 +70,8 @@ def run_item_view(request, item_id:str):
 @csrf_exempt
 def handle_items(request):
     global all_items
-    if request.method == 'GET':
-        if system_state == 'Dashboard':
+    if system_state == 'Dashboard':
+        if request.method == 'GET':
             page_number = request.GET.get('page', 1)
             page_size = request.GET.get('page_size', 10)
             sort_order = request.GET.get('sort')
@@ -95,12 +95,13 @@ def handle_items(request):
                 'result': [item for item in page_obj.object_list]
             }
             return JsonResponse(data)
-        else:
-            return JsonResponse({'error': f'Operation is not allowed'}, status=409) # TODO more details
 
-    elif request.method == 'POST':
-        body = json.loads(request.body)
-        id = body.get('id')
-        description = body.get('description')
-        all_items.append(create_item(id, description))
-        return JsonResponse({'new item added': 'success'})
+        elif request.method == 'POST':
+            body = json.loads(request.body)
+            id = body.get('id')
+            description = body.get('description')
+            all_items.append(create_item(id, description))
+            return JsonResponse({'new item added': 'success'})
+
+    else:
+        return JsonResponse({'error': f'Operation is not allowed in {system_state} state'}, status=409) # TODO more details
