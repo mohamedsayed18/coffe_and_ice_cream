@@ -13,7 +13,7 @@ item_control_allowed: bool = False
 
 # TODO Make system states Enum
 transition_states = {
-    'Log in': ['Dashboard'],
+    'Log in': [],
     'Dashboard': ['Log in', 'Config', 'Item Details', 'Item Control'],
     'Config': ['Dashboard'],
     'Item Details': ['Dashboard', 'Item Control'],
