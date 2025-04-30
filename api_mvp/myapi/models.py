@@ -6,5 +6,5 @@ class SystemSettings(models.Model):
     Only one instance should be used.
     """
     # TODO Remove default values
-    settings = models.CharField(max_length=50, default='system_state', unique=True)
-    value = models.CharField(max_length=50, default='Log in')
+    settings = models.CharField(max_length=50, unique=True)
+    value = models.CharField(max_length=50)
