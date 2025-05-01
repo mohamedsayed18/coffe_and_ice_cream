@@ -4,6 +4,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from dataclasses import asdict
+from typing import Optional
 
 from . import items
 from . import models
@@ -69,11 +70,12 @@ def filter_items(items_list: list, filter: str) -> list:
 def create_item(id: str, description: str) -> dict:
     return asdict(items.Item(id, description, items.state.INIT.value, datetime.now().date().isoformat()))
 
-def get_item(id: str)->dict:
+def get_item(id: str) -> Optional[dict]:
     global all_items
     for i in all_items:
         if i['id'] == id:
             return JsonResponse(i)
+    return None
 
 @csrf_exempt
 def change_item_state(request, item_id:str):
