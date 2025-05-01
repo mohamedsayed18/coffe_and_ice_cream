@@ -70,6 +70,7 @@ def filter_items(items_list: list, filter: str) -> list:
     return filtered_items
 
 def create_item(id: str, description: str) -> dict:
+    models.Items.objects.create(id=id, description=description, state=items.state.INIT.value, date=datetime.now().date().isoformat())
     return asdict(items.Item(id, description, items.state.INIT.value, datetime.now().date().isoformat()))
 
 def get_item(id: str) -> Optional[dict]:
