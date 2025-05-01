@@ -86,7 +86,7 @@ class TestApi(TestCase):
         items_count = self.count_items()
         self.set_system_state('Dashboard')
         url = 'http://localhost:8000/myapi/items/'
-        data = {'id': 'new_item', 'description': 'test item'}
+        data = {'id': 'nintendo', 'description': 'test item'}
 
         response = self.client.post(url, data=json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 200)
@@ -94,14 +94,21 @@ class TestApi(TestCase):
         self.assertEqual(items_count+1, new_items_count)
 
     def test_change_item_state_success(self):
+        # Add item
+        self.set_system_state('Dashboard')
+        url = 'http://localhost:8000/myapi/items/'
+        data = {'id': 'nintendo', 'description': 'test item'}
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json')
+
         self.set_system_state('Item Control')
-        url = 'http://localhost:8000/myapi/items/hbo/state'
+        url = 'http://localhost:8000/myapi/items/nintendo/state'
         data = {'state': 'stop'}
         response = self.client.put(url,data=json.dumps(data))
+        print(json.loads(response.content))
         self.assertEqual(response.status_code, 200)
 
         self.set_system_state('Item Details')
-        url = 'http://localhost:8000/myapi/items/?id=hbo'
+        url = 'http://localhost:8000/myapi/items/?id=nintendo'
         response = self.client.get(url)
         response_data = json.loads(response.content)
         self.assertEqual(response_data['state'], 'stop')
@@ -128,3 +135,6 @@ class TestApi(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['result'], 'successfully logged in')
         self.assertEqual(self.get_system_state(), 'Dashboard')
+
+    def test_item_control(self):    # TODO
+        pass

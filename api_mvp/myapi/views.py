@@ -1,7 +1,8 @@
 from datetime import datetime
 from django.core.paginator import Paginator
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.forms.models import model_to_dict
 import json
 from dataclasses import asdict
 from typing import Optional
@@ -22,8 +23,6 @@ transition_states = {
     'Item Details': ['Dashboard', 'Item Control'],
     'Item Control': ['Dashboard', 'Item Details'],
 }
-
-all_items = items.subscriptions
 
 def get_system_state() -> str:
     state_obj = models.SystemSettings.objects.get(settings='system_state')
@@ -69,52 +68,50 @@ def filter_items(items_list: list, filter: str) -> list:
             filtered_items.append(item)
     return filtered_items
 
-def create_item(id: str, description: str) -> dict:
+def create_item(id: str, description: str) -> None:
     models.Items.objects.create(id=id, description=description, state=items.state.INIT.value, date=datetime.now().date().isoformat())
-    return asdict(items.Item(id, description, items.state.INIT.value, datetime.now().date().isoformat()))
 
-def get_item(id: str) -> Optional[dict]:
-    global all_items
-    for i in all_items:
+def get_item(id: str, items_list: list) -> Optional[dict]:
+    for i in items_list:
         if i['id'] == id:
             return JsonResponse(i)
     return None
 
 @csrf_exempt
 def change_item_state(request, item_id:str):
-    global all_items
     if request.method == 'PUT':
         if get_system_state() == 'Item Control':
             data = json.loads(request.body)
-            state = data.get('state')
-            for i in all_items:
-                if i['id'] == item_id:
-                    i['state'] = state # TODO USE enum to avoid typo
-                    return JsonResponse({'result': f'item {i['id']} state is {state}'})
+            new_state = data.get('state')
+            item_obj = models.Items.objects.get(id=item_id)
+            item_obj.state = new_state
+            item_obj.save()
+            return JsonResponse({'result': f'item {item_id} state is {new_state}'})
 
 @csrf_exempt
 def handle_items(request):
-    global all_items
     if request.method == 'GET':
+        all_items = models.Items.objects.all()
+        items_list = [model_to_dict(item) for item in all_items]
         page_number = request.GET.get('page', 1)
         page_size = request.GET.get('page_size', 10)
         sort_order = request.GET.get('sort')
         id = request.GET.get('id')
         if id:
             if get_system_state() == 'Item Details':
-                return get_item(id)
+                return get_item(id, items_list)
             else:
                 return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
 
         if get_system_state() == 'Dashboard':
             if sort_order:
                 reverse = sort_order == 'desc'
-                all_items.sort(key=lambda item: item['created_at'], reverse=reverse)
+                items_list.sort(key=lambda item: item['created_at'], reverse=reverse)
 
             state_filter = request.GET.get('state')
             if state_filter:
-                all_items = filter_items(items.subscriptions, state_filter)
-            paginator = Paginator(all_items, page_size)
+                items_list = filter_items(items_list, state_filter)
+            paginator = Paginator(items_list, page_size)
             page_obj = paginator.get_page(page_number)
 
             data = {
@@ -131,7 +128,7 @@ def handle_items(request):
             body = json.loads(request.body)
             id = body.get('id')
             description = body.get('description')
-            all_items.append(create_item(id, description))
+            create_item(id, description)
             return JsonResponse({'new item added': 'success'})
         else:
             return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
