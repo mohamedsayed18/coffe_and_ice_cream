@@ -113,9 +113,26 @@ class TestApi(TestCase):
         response_data = json.loads(response.content)
         self.assertEqual(response_data['state'], 'stop')
 
-
     def test_item_control_failure(self):
-        pass
+        self.set_system_state('Dashboard')
+        url = 'http://localhost:8000/myapi/item-control/'
+        data = {'allowed': 'true'}
+        respones = self.client.put(url, data=json.dumps(data))
+        self.assertEqual(respones.status_code, 409)
+
+    def test_item_control_success(self):    # TODO
+        self.set_system_state('Config')
+        url = 'http://localhost:8000/myapi/item-control/'
+        data = {'allowed': 'true'}
+        respones = self.client.put(url, data=json.dumps(data))
+        self.assertEqual(respones.status_code, 200)
+
+        self.set_system_state('Dashboard')
+        url = 'http://localhost:8000/myapi/state/'
+        data = {'new_state': 'Item Control'}
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.get_system_state(), 'Item Control')
 
     def test_update_user_credentials(self):
         self.set_system_state('Config')
@@ -135,6 +152,3 @@ class TestApi(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data['result'], 'successfully logged in')
         self.assertEqual(self.get_system_state(), 'Dashboard')
-
-    def test_item_control(self):    # TODO
-        pass
