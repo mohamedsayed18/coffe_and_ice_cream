@@ -109,3 +109,22 @@ class TestApi(TestCase):
 
     def test_item_control_failure(self):
         pass
+
+    def test_update_user_credentials(self):
+        self.set_system_state('Config')
+        url = 'http://localhost:8000/myapi/user/'
+        data = {"username": "Hero", "password": "789"}
+        response = self.client.put(url, data=json.dumps(data))
+        self.assertEqual(response.status_code, 200)
+
+        # login with the new name and password
+        url = 'http://localhost:8000/myapi/login/'
+        data = {
+            'username': 'Hero',
+            'password': '789'
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json')
+        response_data = json.loads(response.content)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response_data['result'], 'successfully logged in')
+        self.assertEqual(self.get_system_state(), 'Dashboard')

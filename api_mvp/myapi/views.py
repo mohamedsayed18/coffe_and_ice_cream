@@ -11,6 +11,8 @@ from . import models
 
 
 item_control_allowed: bool = False
+user_name = 'admin'
+password = '1234'
 
 # TODO Make system states Enum
 transition_states = {
@@ -36,9 +38,9 @@ def set_system_state(new_state: str) -> None:
 def login(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        username = data.get('username')
-        password = data.get('password')
-        if username == 'admin' and password == '1234':
+        login_name = data.get('username')
+        login_password = data.get('password')
+        if login_name == user_name and login_password == password:
             set_system_state('Dashboard')
             return JsonResponse({'result': 'successfully logged in'})
         else:
@@ -133,8 +135,13 @@ def handle_items(request):
         else:
             return JsonResponse({'error': f'Operation is not allowed in {get_system_state()} state'}, status=409)
 
-def update_credentials():
-    pass    #TODO
+def update_credentials(new_username:str, new_password:str) -> None:
+    global user_name
+    global password
+    if new_username:
+        user_name = new_username
+    if new_password:
+        password = new_password
 
 @csrf_exempt
 def update_user(request):
@@ -142,11 +149,11 @@ def update_user(request):
         if request.method == 'PUT':
             try:
                 data = json.loads(request.body)
-                username = data.get('username')
-                password = data.get('password')
-                update_credentials()
+                new_username = data.get('username')
+                new_password = data.get('password')
+                update_credentials(new_username, new_password)
                 set_system_state('Log in')
-                return JsonResponse({'message': 'User updated'}, status=200)
+                return JsonResponse({'message': 'User Credentials updated'}, status=200)
             except json.JSONDecodeError:
                 return JsonResponse({'error': 'Invalid JSON'}, status=400)
         else:

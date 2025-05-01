@@ -1,4 +1,7 @@
 # Irdeto_sw_tasks
+1. [API Design and API Test Design](#api-design-and-api-test-design)
+2. [Unit Testing](#unit-testing)
+3. [DASH Parsing and Validation](#dash-parsing-and-validation)
 
 ## API Design and API Test Design
 ### REST API Endpoints
@@ -19,13 +22,20 @@
 ### State transition diagram
 ![](./api_mvp/state_transition_diagram.png)
 
-### Run the demo
-1. `cd api_mvp/`
-2. Run server `python manage.py runserver` 
+##### Run the demo
+```
+cd api_mvp/
+python manage.py runserver 
+```
+You can use postman or any other tool to test the server on `http://localhost:8000/`
 
-run tests `python manage.py test`
+##### Run tests
+```
+cd api_mvp/
+python manage.py test
+```
 
-### Explanation
+#### Explanation
 I used Django to build a web app and implement the API
 
 
@@ -38,3 +48,11 @@ Run tests: `pytest Math_function/test_discontinuous_function.py`
 ## DASH Parsing and Validation
 
 Run code: `python3 period_checker/period_validity.py`
+
+I check the validity of a Period by checking the following:
+* If there is a `start` attribute exists in a `Period` tag
+* If there is one or more `adaptationsets`
+* If there is one or more `Representation`
+* If there is a `SegmentTemplate`
+* If there is a media attribute in the SegmentTemplate tag
+* If the media format is `$Number$` or `$Time$`
