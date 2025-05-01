@@ -64,11 +64,31 @@ class TestApi(TestCase):
         response = self.client.post(url, data=json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 409)
 
-    def test_add_item_failure(self):
+    def count_items(self) -> int:
+        self.set_system_state('Dashboard')
         url = 'http://localhost:8000/myapi/items/'
-        data = {'new_state': 'Item Details'}
+        response = self.client.get(url)
+        response_data = json.loads(response.content)
+        return response_data['count']
+
+    def test_add_item_failure(self):
+        items_count = self.count_items()
+        self.set_system_state('Item Details')
+        url = 'http://localhost:8000/myapi/items/'
+        data = {'id': 'new_item', 'description': 'test item'}
+
         response = self.client.post(url, data=json.dumps(data), content_type='application/json')
         self.assertEqual(response.status_code, 409)
+        new_items_count = self.count_items()
+        self.assertEqual(items_count, new_items_count)
 
-    def test_add_item_in_correct_state(self):
-        pass
+    def test_add_item_success(self):
+        items_count = self.count_items()
+        self.set_system_state('Dashboard')
+        url = 'http://localhost:8000/myapi/items/'
+        data = {'id': 'new_item', 'description': 'test item'}
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        new_items_count = self.count_items()
+        self.assertEqual(items_count+1, new_items_count)
