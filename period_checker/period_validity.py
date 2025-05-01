@@ -54,11 +54,26 @@ def valid_period(period: ET.ElementTree) -> bool:
             print('Invalid period, No segment template')
             return False
 
+    print(f'Valid Tree')
     return True
 
 
 if __name__ == '__main__':
-    valid_tree = ET.parse('./period_checker/sample_period.xml')
-    invalid_tree = ET.parse('./period_checker/wrong_period.xml')
-    print(valid_period(valid_tree))
-    print(valid_period(invalid_tree))
+    valid_tree = ET.parse('./period_checker/valid_period.xml')
+    valid_period(valid_tree)
+
+    invalid_tree_no_start = ET.parse('./period_checker/invalid_period_no_start.xml')
+    invalid_tree_no_adapt = ET.parse('./period_checker/invalid_period_no_adaptationset.xml')
+    invalid_tree_no_rep = ET.parse('./period_checker/invalid_period_no_representation.xml')
+    invalid_tree_no_segment = ET.parse('./period_checker/invalid_period_no_segment.xml')
+    invalid_tree_no_media = ET.parse('./period_checker/invalid_period_no_media.xml')
+    invalid_tree_bad_format = ET.parse('./period_checker/invalid_period_bad_format.xml')
+    invalid_tree_no_init = ET.parse('./period_checker/invalid_period_no_init.xml')
+
+    valid_period(invalid_tree_no_start)
+    valid_period(invalid_tree_no_adapt)
+    valid_period(invalid_tree_no_rep)
+    valid_period(invalid_tree_no_segment)
+    valid_period(invalid_tree_no_media)
+    valid_period(invalid_tree_bad_format)
+    valid_period(invalid_tree_no_init)
