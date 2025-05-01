@@ -43,7 +43,7 @@ I used Django to build a web app and implement the API
 
 Run tests: `pytest Math_function/test_discontinuous_function.py`
 
-![](plot.png)
+![](./Math_function/plot.png)
 
 ## DASH Parsing and Validation
 
