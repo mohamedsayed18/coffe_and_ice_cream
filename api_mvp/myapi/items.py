@@ -1,5 +1,5 @@
 from dataclasses import dataclass, asdict
-from datetime import datetime, date
+from datetime import date
 from enum import Enum
 
 

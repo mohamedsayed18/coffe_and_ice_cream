@@ -92,3 +92,20 @@ class TestApi(TestCase):
         self.assertEqual(response.status_code, 200)
         new_items_count = self.count_items()
         self.assertEqual(items_count+1, new_items_count)
+
+    def test_change_item_state_success(self):
+        self.set_system_state('Item Control')
+        url = 'http://localhost:8000/myapi/items/hbo/state'
+        data = {'state': 'stop'}
+        response = self.client.put(url,data=json.dumps(data))
+        self.assertEqual(response.status_code, 200)
+
+        self.set_system_state('Item Details')
+        url = 'http://localhost:8000/myapi/items/?id=hbo'
+        response = self.client.get(url)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['state'], 'stop')
+
+
+    def test_item_control_failure(self):
+        pass

@@ -73,7 +73,7 @@ def get_item(id: str)->dict:
     global all_items
     for i in all_items:
         if i['id'] == id:
-            return JsonResponse({'item': i})
+            return JsonResponse(i)
 
 @csrf_exempt
 def change_item_state(request, item_id:str):
