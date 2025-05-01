@@ -1,9 +1,10 @@
-# Irdeto_sw_tasks
+# Software Challenges
 1. [API Design and API Test Design](#api-design-and-api-test-design)
 2. [Unit Testing](#unit-testing)
 3. [DASH Parsing and Validation](#dash-parsing-and-validation)
 
-## API Design and API Test Design
+## 🛠️ API Design and API Test Design
+I used Django to build a web app and implement the API
 ### REST API Endpoints
 
 | Endpoint                         | Method | Description                                      | Request Body Example                        |
@@ -22,32 +23,38 @@
 ### State transition diagram
 ![](./api_mvp/state_transition_diagram.png)
 
-##### Run the demo
+##### Installation
+1. Install dependencies
+```bash
+pip install -r /api_mvp/requirements.txt
 ```
+2. Apply Migrations (Creates tables)
+```bash
+cd api_mvp/
+python manage.py migrate
+```
+Then you can run the server and test the api manually using postman or any other tool, the server runs on `http://localhost:8000/`
+```bash
 cd api_mvp/
 python manage.py runserver 
 ```
-You can use postman or any other tool to test the server on `http://localhost:8000/`
 
-##### Run tests
-```
+Or you can Run tests(Run server is not needed)
+```bash
 cd api_mvp/
 python manage.py test
 ```
 
-#### Explanation
-I used Django to build a web app and implement the API
-
-
-## Unit Testing
-
-Run tests: `pytest Math_function/test_discontinuous_function.py`
-
+## 🧪 Unit Testing
+```bash
+pytest Math_function/test_discontinuous_function.py
+```
 ![](./Math_function/plot.png)
 
-## DASH Parsing and Validation
-
-Run code: `python3 period_checker/period_validity.py`
+## ✅ DASH Parsing and Validation
+```bash
+python3 period_checker/period_validity.py
+```
 
 I check the validity of a Period by checking the following:
 * If there is a `start` attribute exists in a `Period` tag
