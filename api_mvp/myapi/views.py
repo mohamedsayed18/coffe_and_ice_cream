@@ -15,7 +15,6 @@ item_control_allowed: bool = False
 user_name = 'admin'
 password = '1234'
 
-# TODO Make system states Enum
 transition_states = {
     'Log in': [],
     'Dashboard': ['Log in', 'Config', 'Item Details', 'Item Control'],

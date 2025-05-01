@@ -120,7 +120,7 @@ class TestApi(TestCase):
         respones = self.client.put(url, data=json.dumps(data))
         self.assertEqual(respones.status_code, 409)
 
-    def test_item_control_success(self):    # TODO
+    def test_item_control_success(self):
         self.set_system_state('Config')
         url = 'http://localhost:8000/myapi/item-control/'
         data = {'allowed': 'true'}
