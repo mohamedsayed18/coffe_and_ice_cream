@@ -11,7 +11,6 @@ from typing import Optional
 from . import models
 
 
-item_control_allowed: bool = False
 user_name = 'admin'
 password = '1234'
 
@@ -56,7 +55,8 @@ def change_system_state(request):
         body = json.loads(request.body)
         new_state = body.get('new_state')
         if new_state in transition_states[get_system_state()]:
-            if new_state == 'Item Control' and not item_control_allowed:
+            item_control_allowed, _ = models.SystemSettings.objects.get_or_create(settings='item_control_allowed', defaults={'value': 'false'})
+            if new_state == 'Item Control' and item_control_allowed.value.lower() != 'true':
                 return JsonResponse({'error': f'Transition to Item Control Denied'}, status=409)
             set_system_state(new_state)
             return JsonResponse({'new_state': get_system_state()})
@@ -164,13 +164,15 @@ def update_user(request):
 
 @csrf_exempt
 def item_control_access(request) -> None:
-    global item_control_allowed
     if get_system_state() == 'Config':
         if request.method == 'PUT':
             data = json.loads(request.body)
-            item_control_allowed = data.get('allowed')
+            allowed = data.get('allowed')
+            item_control_allowed, _ = models.SystemSettings.objects.get_or_create(settings='item_control_allowed', defaults={'value': allowed})
+            item_control_allowed.value = allowed
+            item_control_allowed.save()
             set_system_state('Log in')
-            return JsonResponse({'message': f'Access to Item Control set to {item_control_allowed}'})
+            return JsonResponse({'message': f'Access to Item Control set to {allowed}'})
         else:
             return JsonResponse({'error': 'Method not allowed'}, status=405)
 

@@ -104,7 +104,6 @@ class TestApi(TestCase):
         url = 'http://localhost:8000/myapi/items/nintendo/state'
         data = {'state': 'stop'}
         response = self.client.put(url,data=json.dumps(data))
-        print(json.loads(response.content))
         self.assertEqual(response.status_code, 200)
 
         self.set_system_state('Item Details')
