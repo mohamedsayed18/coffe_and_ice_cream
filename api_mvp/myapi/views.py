@@ -3,17 +3,23 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.forms.models import model_to_dict
+from enum import Enum
 import json
 from dataclasses import asdict
 from typing import Optional
 
-from . import items
 from . import models
 
 
 item_control_allowed: bool = False
 user_name = 'admin'
 password = '1234'
+
+class state(Enum):
+    INIT = 'init'
+    RUN = 'run'
+    PAUSE = 'pause'
+    STOP = 'stop'
 
 transition_states = {
     'Log in': [],
@@ -68,7 +74,7 @@ def filter_items(items_list: list, filter: str) -> list:
     return filtered_items
 
 def create_item(id: str, description: str) -> None:
-    models.Items.objects.create(id=id, description=description, state=items.state.INIT.value, date=datetime.now().date().isoformat())
+    models.Items.objects.create(id=id, description=description, state=state.INIT.value, date=datetime.now().date().isoformat())
 
 def get_item(id: str, items_list: list) -> Optional[dict]:
     for i in items_list:

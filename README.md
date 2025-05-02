@@ -10,7 +10,7 @@ I used Django to build a web app and implement the API
 | Endpoint                         | Method | Description                                      | Request Body Example                        |
 |----------------------------------|--------|--------------------------------------------------|---------------------------------------------|
 | `/myapi/login/`                        | POST   | Log in a user                                   | `{ "username": "admin", "password": "1234" }`|
-| `/myapi/state/`                        | GET    | Get the current system state                    | —                                           |
+| `/myapi/state/`                        | GET    | Get the current system state, mainly used for testing | —                                           |
 | `/myapi/state/`                        | POST   | Change the system state                         | `{ "new_state": "Dashboard" }`              |
 | `/myapi/items/`                        | GET    | List items (supports `page`, `page_size`, `sort`, `state`) | —                                           |
 |                                  |        | Example(/items/?page=1&page_size=5&sort=desc&state=run) |                                     |
@@ -33,15 +33,17 @@ pip install -r /api_mvp/requirements.txt
 cd api_mvp/
 python manage.py migrate
 ```
+3. populate initial data into data base
+```bash
+python manage.py loaddata initial_data.json
+```
 Then you can run the server and test the api manually using postman or any other tool, the server runs on `http://localhost:8000/`
 ```bash
-cd api_mvp/
 python manage.py runserver 
 ```
 
 Or you can Run tests(Run server is not needed)
 ```bash
-cd api_mvp/
 python manage.py test
 ```
 
@@ -55,11 +57,11 @@ pytest Math_function/test_discontinuous_function.py
 ```bash
 python3 period_checker/period_validity.py
 ```
-
+I started by looking at the DASH format documentation https://developers.broadpeak.io/docs/foundations-dash#periods.
 I check the validity of a Period by checking the following:
 * If there is a `start` attribute exists in a `Period` tag
 * If there is one or more `adaptationsets`
 * If there is one or more `Representation`
 * If there is a `SegmentTemplate`
-* If there is a media attribute in the SegmentTemplate tag
+* If there is a `media` attribute in the SegmentTemplate tag
 * If the media format is `$Number$` or `$Time$`

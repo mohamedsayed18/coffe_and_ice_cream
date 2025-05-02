@@ -1,15 +1,3 @@
-# How to define valid or not valid period
-# according to the DASH format documentation https://developers.broadpeak.io/docs/foundations-dash#periods
-# It could be programaticaly wrong
-
-'''
-It could be sematic wrong due to any of the following:
-* time
-* Each Period contains one or multiple Adaptation Sets.
-* Each Adaptation Set contains one or multiple Representations.
-* Is it a must? A Representation is composed of multiple Segments. They contain the actual media being played back by the video player.
-*
-'''
 import xml.etree.ElementTree as ET
 
 
